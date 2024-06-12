@@ -17,11 +17,8 @@ jobs:
       with:
         python-version: '3.x'
 
-    - name: Install g++ and Cache
+    - name: Install dependencies
       run: sudo apt-get update && sudo apt-get install -y gcc g++
-      cache:
-        key: ${{ runner.os }}-gcc-${{ hashFiles('main.py') }}
-        path: /usr/bin/g++
 
     - name: Cache pip
       uses: actions/cache@v3
@@ -35,7 +32,7 @@ jobs:
       uses: actions/cache@v3
       with:
         path: ~/.cache/nuitka
-        key: ${{ runner.os }}-nuitka-${{ runner.os }}
+        key: ${{ runner.os }}-nuitka-${{ hashFiles('main.py') }}
         restore-keys: |
           ${{ runner.os }}-nuitka-
 
