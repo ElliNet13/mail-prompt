@@ -13,40 +13,42 @@ jobs:
       uses: actions/checkout@v3
 
     - name: Set up Python
-      uses: actions/setup-python@v4
+      uses: actions/setup-python@v2
       with:
         python-version: '3.x'
 
-    - name: Install dependencies
-      run: sudo apt-get update && sudo apt-get install -y gcc g++
+    - name: Install g++
+      run: |
+        sudo apt-get update
+        sudo apt-get install -y g++
 
-    - name: Cache pip
-      uses: actions/cache@v3
+    - name: Cache g++
+      id: cache-g++
+      uses: actions/cache@v2
       with:
-        path: ~/.cache/pip
-        key: ${{ runner.os }}-pip-${{ hashFiles('main.py') }}
-        restore-keys: |
-          ${{ runner.os }}-pip-
-
-    - name: Cache nuitka
-      uses: actions/cache@v3
-      with:
-        path: ~/.cache/nuitka
-        key: ${{ runner.os }}-nuitka-${{ hashFiles('main.py') }}
-        restore-keys: |
-          ${{ runner.os }}-nuitka-
+        path: /usr/bin/g++
+        key: ${{ runner.os }}-g++
 
     - name: Install nuitka
       run: |
         python -m pip install --upgrade pip
         pip install nuitka
 
+    - name: Cache nuitka
+      id: cache-nuitka
+      uses: actions/cache@v2
+      with:
+        path: ~/.cache/nuitka
+        key: ${{ runner.os }}-nuitka-${{ hashFiles('main.py') }}
+        restore-keys: |
+          ${{ runner.os }}-nuitka-
+
     - name: Build with nuitka
       run: |
         python -m nuitka --standalone --onefile --output-dir=output main.py
 
     - name: Upload artifact
-      uses: actions/upload-artifact@v3
+      uses: actions/upload-artifact@v2
       with:
         name: main-bin
         path: ./output/main.bin
